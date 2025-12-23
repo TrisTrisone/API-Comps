@@ -446,6 +446,22 @@ class CopilotResponseProcessor:
             if path.startswith("Shared Documents/"):
                 path = path.replace("Shared Documents/", "", 1)
             
+            # Normalize path variations to standard folder names
+            # Replace "/Public/" or "/Public Comps/" variations with "/Public Comps/"
+            import re
+            # Match patterns like: /Public/, /Public Comps/, /public/, etc.
+            path = re.sub(r'/Public(?:\s+Comps)?/', '/Public Comps/', path, flags=re.IGNORECASE)
+            # Also handle if it starts with "Public" or "Public Comps"
+            if re.match(r'^Public(?:\s+Comps)?/', path, flags=re.IGNORECASE):
+                path = re.sub(r'^Public(?:\s+Comps)?/', 'Public Comps/', path, flags=re.IGNORECASE)
+            
+            # Replace "/M&A/" or "/M&A Comps/" variations with "/M&A Comps/"
+            # Match patterns like: /M&A/, /M&A Comps/, /MA/, /M & A/, etc.
+            path = re.sub(r'/M\s*&?\s*A(?:\s+Comps)?/', '/M&A Comps/', path, flags=re.IGNORECASE)
+            # Also handle if it starts with "M&A" variations
+            if re.match(r'^M\s*&?\s*A(?:\s+Comps)?/', path, flags=re.IGNORECASE):
+                path = re.sub(r'^M\s*&?\s*A(?:\s+Comps)?/', 'M&A Comps/', path, flags=re.IGNORECASE)
+            
             # Now handle the remaining path
             # If path already starts with "All Documents/", use it as-is
             if path.startswith("All Documents/"):
